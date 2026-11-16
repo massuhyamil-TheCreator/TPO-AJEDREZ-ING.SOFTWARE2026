@@ -48,11 +48,14 @@ un SDK JavaFX manualmente: Maven descarga sus dependencias para tu sistema.
 ## Alcance de las reglas
 
 La GUI utiliza las reglas existentes: tablero 8×8, seis tipos de piezas,
-turnos, capturas, movimientos con bloqueos, jaque y prevención del autojaque.
+turnos, capturas, movimientos con bloqueos, jaque, jaque mate, ahogado
+(tablas por falta de movimientos legales) y prevención del autojaque.
 
-**El backend original no implementa enroque, promoción, captura al paso,
-jaque mate ni tablas. Esta actualización de frontend tampoco los agrega.**
-Un aviso de jaque no declara un ganador. No se agregaron reloj, IA ni juego en red.
+**El backend no implementa enroque, promoción, captura al paso, ni tablas
+por repetición o regla de 50 movimientos** (alcance opcional del TPO, sin
+empezar). Jaque mate y ahogado sí están implementados y terminan la
+partida: la Console y la GUI avisan quién ganó o si fue tablas, y no
+aceptan más movimientos. No se agregaron reloj, IA ni juego en red.
 
 ## Arquitectura
 
