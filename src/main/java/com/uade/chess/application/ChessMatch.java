@@ -10,6 +10,8 @@ import com.uade.chess.domain.pieces.Piece;
 import com.uade.chess.domain.rules.CheckDetector;
 import com.uade.chess.domain.rules.MoveValidator;
 
+import java.util.Map;
+
 /**
  * Implementa IChessGame. Orquesta MoveValidator y CheckDetector sobre un
  * Board — a propósito NO contiene ninguna regla de ajedrez propia, solo
@@ -59,6 +61,39 @@ public final class ChessMatch implements ChessGame {
 
     @Override
     public GameStatus getStatus() {
-        return checkDetector.isInCheck(board, currentTurn) ? GameStatus.CHECK : GameStatus.IN_PROGRESS;
+        boolean inCheck = checkDetector.isInCheck(board, currentTurn);
+        if (hasAnyLegalMove()) {
+            return inCheck ? GameStatus.CHECK : GameStatus.IN_PROGRESS;
+        }
+        return inCheck ? GameStatus.CHECKMATE : GameStatus.STALEMATE;
+    }
+
+    /**
+     * ¿Le queda a currentTurn al menos un movimiento legal? No duplica
+     * ninguna regla de ajedrez: para cada pieza propia y cada casilla del
+     * tablero, le pregunta a MoveValidator (la misma autoridad que usa
+     * move()) si ese movimiento sería válido, sobre un clon descartable
+     * del tablero real. En cuanto encuentra uno, corta.
+     */
+    private boolean hasAnyLegalMove() {
+        for (Map.Entry<Position, Piece> entry : board.getOccupiedSquares().entrySet()) {
+            if (entry.getValue().getColor() != currentTurn) {
+                continue;
+            }
+            Position from = entry.getKey();
+            for (int row = 0; row < board.getDimensions().height(); row++) {
+                for (int column = 0; column < board.getDimensions().width(); column++) {
+                    Position to = new Position(row, column);
+                    if (from.equals(to)) {
+                        continue;
+                    }
+                    Board probe = board.clone();
+                    if (moveValidator.validate(new Move(from, to), probe, currentTurn).isSuccess()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

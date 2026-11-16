@@ -130,6 +130,10 @@ class ChessControllerTest {
 
     @Test
     void checkComesFromTheBackendAndIsStoredInHistory() {
+        // Esta secuencia (Mate del Aficionado sin que Negras defiendan f7)
+        // es jaque MATE de verdad, no solo jaque: antes del fix de
+        // CHECKMATE/STALEMATE, getStatus() no tenía forma de distinguirlos
+        // y este mismo test se conformaba con CHECK, ocultando el bug.
         play("e2", "e4");
         play("e7", "e5");
         play("f1", "c4");
@@ -138,10 +142,11 @@ class ChessControllerTest {
         play("a7", "a6");
         play("h5", "f7");
         var state = controller.state();
-        assertEquals(GameStatus.CHECK, state.status());
+        assertEquals(GameStatus.CHECKMATE, state.status());
         assertTrue(state.lastMove().check());
         assertEquals("h5 × f7 +", state.lastMove().notation());
         assertEquals(PieceColor.BLACK, state.turn());
+        assertTrue(controller.isGameOver());
     }
 
     @Test

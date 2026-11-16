@@ -182,8 +182,15 @@ public final class ChessWindow {
         ChessViewState state = controller.state();
         board.render(state);
         turn.setText("Turno de " + PresentationText.color(state.turn()).toLowerCase());
-        status.setText(state.status() == GameStatus.CHECK ? "JAQUE · Protegé a tu rey" : "En progreso");
-        status.getStyleClass().setAll("status-pill", state.status() == GameStatus.CHECK ? "status-check" : "status-normal");
+        status.setText(switch (state.status()) {
+            case CHECK -> "JAQUE · Protegé a tu rey";
+            case CHECKMATE -> "JAQUE MATE · Ganan las " + PresentationText.color(state.turn().opposite());
+            case STALEMATE -> "AHOGADO · Tablas, sin movimientos legales";
+            case IN_PROGRESS -> "En progreso";
+        });
+        boolean alert = state.status() == GameStatus.CHECK || state.status() == GameStatus.CHECKMATE
+                || state.status() == GameStatus.STALEMATE;
+        status.getStyleClass().setAll("status-pill", alert ? "status-check" : "status-normal");
         feedback.setText(state.message());
         feedback.getStyleClass().setAll("feedback", state.error() ? "feedback-error" : "feedback-info");
         selected.setText(state.selected() == null ? "Seleccioná una pieza"

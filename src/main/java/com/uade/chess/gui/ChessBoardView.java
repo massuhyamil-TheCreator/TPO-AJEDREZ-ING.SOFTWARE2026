@@ -80,7 +80,8 @@ public final class ChessBoardView extends Region {
                 if (last != null && (position.equals(last.move().from())
                         || position.equals(last.move().to()))) square.getStyleClass().add("last-move");
                 if (piece != null && Character.toLowerCase(piece.getSymbol()) == 'k'
-                        && piece.getColor() == state.turn() && state.status() == GameStatus.CHECK) {
+                        && piece.getColor() == state.turn()
+                        && (state.status() == GameStatus.CHECK || state.status() == GameStatus.CHECKMATE)) {
                     square.getStyleClass().add("checked-king");
                 }
                 if (position.equals(state.selected())) square.getStyleClass().add("selected-square");

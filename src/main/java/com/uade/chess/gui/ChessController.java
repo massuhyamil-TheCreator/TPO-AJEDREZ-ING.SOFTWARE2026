@@ -1,6 +1,7 @@
 package com.uade.chess.gui;
 
 import com.uade.chess.application.ChessGame;
+import com.uade.chess.application.GameStatus;
 import com.uade.chess.domain.Move;
 import com.uade.chess.domain.MoveResult;
 import com.uade.chess.domain.PieceColor;
@@ -33,6 +34,11 @@ public final class ChessController {
         Objects.requireNonNull(position);
         if (position.row() < 0 || position.row() >= 8
                 || position.column() < 0 || position.column() >= 8) return;
+        if (isGameOver()) {
+            message = "La partida terminó. Elegí \"Nueva partida\" para seguir jugando.";
+            error = true;
+            return;
+        }
         Piece target = game.getPieceAt(position);
         if (position.equals(selected)) {
             clearSelection();
@@ -58,13 +64,24 @@ public final class ChessController {
                         result.getCapturedPiece(), result.isCheck());
                 history.add(entry);
                 clearSelection();
-                message = entry.notation() + (result.isCheck() ? " · ¡Jaque!" : " · Movimiento realizado.");
+                message = switch (game.getStatus()) {
+                    case CHECKMATE -> entry.notation() + " · ¡Jaque mate! Ganan las "
+                            + PresentationText.color(player).toLowerCase() + ".";
+                    case STALEMATE -> entry.notation() + " · Ahogado, tablas sin movimientos legales.";
+                    case CHECK -> entry.notation() + " · ¡Jaque!";
+                    case IN_PROGRESS -> entry.notation() + " · Movimiento realizado.";
+                };
                 error = false;
             } else {
                 message = PresentationText.failure(result.getFailureReason());
                 error = true;
             }
         }
+    }
+
+    public boolean isGameOver() {
+        GameStatus status = game.getStatus();
+        return status == GameStatus.CHECKMATE || status == GameStatus.STALEMATE;
     }
 
     public void clearSelection() {

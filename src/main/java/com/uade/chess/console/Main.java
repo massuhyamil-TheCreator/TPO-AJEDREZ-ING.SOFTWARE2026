@@ -2,6 +2,7 @@ package com.uade.chess.console;
 
 import com.uade.chess.application.ChessGame;
 import com.uade.chess.application.ChessMatch;
+import com.uade.chess.application.GameStatus;
 import com.uade.chess.domain.MoveResult;
 import com.uade.chess.domain.Position;
 
@@ -56,7 +57,15 @@ public final class Main {
                 }
 
                 renderer.render(game);
-                if (result.isCheck()) {
+
+                GameStatus status = game.getStatus();
+                if (status == GameStatus.CHECKMATE) {
+                    System.out.println("¡Jaque mate! Ganan las " + game.getCurrentTurn().opposite());
+                    break;
+                } else if (status == GameStatus.STALEMATE) {
+                    System.out.println("Ahogado: " + game.getCurrentTurn() + " no tiene movimientos legales. Tablas.");
+                    break;
+                } else if (result.isCheck()) {
                     System.out.println("¡Jaque!");
                 }
             } catch (IllegalArgumentException e) {
