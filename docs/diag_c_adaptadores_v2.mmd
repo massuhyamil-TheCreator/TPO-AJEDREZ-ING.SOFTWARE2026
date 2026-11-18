@@ -1,0 +1,80 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontFamily':'Liberation Serif, Georgia, serif', 'primaryColor':'#ffffff', 'primaryBorderColor':'#33415c', 'primaryTextColor':'#1a1a1a', 'lineColor':'#5c6b7a', 'secondaryColor':'#f7f5f0', 'tertiaryColor':'#ffffff', 'classText':'#1a1a1a', 'fontSize':'15px' }}}%%
+classDiagram
+    class ChessGame {
+        <<interface, puerto>>
+    }
+    class ChessMatch {
+        <<implementacion concreta>>
+    }
+
+    class Main {
+        <<composition root>>
+        +main(String[])$
+    }
+    class ConsoleBoardRenderer {
+        +render(ChessGame)
+    }
+    class PositionParser {
+        <<utility>>
+        +parse(String)$ Position
+    }
+
+    class ChessGuiApp {
+        <<composition root>>
+        +start(Stage)
+    }
+    class ChessController {
+        -game: ChessGame
+        -preview: LegalMovePreview
+        -history: List~MoveEntry~
+        -selected: Position
+        +click(Position)
+        +isGameOver() boolean
+        +state() ChessViewState
+    }
+    class LegalMovePreview {
+        -newGame: Supplier~ChessGame~
+        +destinations(Position, List~Move~) List~Position~
+    }
+    class ChessViewState {
+        <<record>>
+        +board: List~Piece~
+        +turn: PieceColor
+        +status: GameStatus
+        +legalMoves: List~Position~
+    }
+    class ChessWindow {
+        -controller: ChessController
+        -board: ChessBoardView
+        -pieces: PieceRenderer
+        +show()
+        -render()
+    }
+    class ChessBoardView {
+        -renderer: PieceRenderer
+        -state: ChessViewState
+        +render(ChessViewState)
+        +flip()
+    }
+    class PieceRenderer {
+        +create(Piece) Region
+    }
+
+    Main ..> ChessMatch : crea
+    Main --> ChessGame
+    Main ..> ConsoleBoardRenderer
+    Main ..> PositionParser
+    ConsoleBoardRenderer ..> ChessGame
+
+    ChessGuiApp ..> ChessMatch : crea
+    ChessGuiApp "1" o-- "1" ChessController
+    ChessGuiApp "1" o-- "1" ChessWindow
+    ChessController --> ChessGame
+    ChessController "1" o-- "1" LegalMovePreview
+    ChessController ..> ChessViewState : construye
+    LegalMovePreview ..> ChessGame
+    ChessWindow "1" o-- "1" ChessController
+    ChessWindow "1" o-- "1" ChessBoardView
+    ChessWindow "1" o-- "1" PieceRenderer
+    ChessBoardView "1" o-- "1" PieceRenderer
+    ChessGame <|.. ChessMatch

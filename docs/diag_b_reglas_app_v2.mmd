@@ -1,0 +1,79 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontFamily':'Liberation Serif, Georgia, serif', 'primaryColor':'#ffffff', 'primaryBorderColor':'#33415c', 'primaryTextColor':'#1a1a1a', 'lineColor':'#5c6b7a', 'secondaryColor':'#f7f5f0', 'tertiaryColor':'#ffffff', 'classText':'#1a1a1a', 'fontSize':'15px' }}}%%
+classDiagram
+    class Move {
+        <<record>>
+        +from: Position
+        +to: Position
+    }
+    class MoveFailureReason {
+        <<enumeration>>
+        OUT_OF_BOUNDS
+        EMPTY_ORIGIN
+        NOT_YOUR_TURN
+        FRIENDLY_FIRE
+        INVALID_PIECE_MOVEMENT
+        SELF_CHECK
+    }
+    class MoveResult {
+        -failureReason: MoveFailureReason
+        -capturedPiece: Piece
+        +ok(Piece, boolean)$ MoveResult
+        +fail(MoveFailureReason)$ MoveResult
+        +isSuccess() boolean
+        +isCheck() boolean
+        +getCapturedPiece() Piece
+    }
+    class CheckDetector {
+        +isInCheck(Board, PieceColor) boolean
+    }
+    class MoveValidator {
+        -checkDetector: CheckDetector
+        +validate(Move, Board, PieceColor) MoveResult
+    }
+    class ChessGame {
+        <<interface>>
+        +move(Position, Position) MoveResult
+        +getPieceAt(Position) Piece
+        +getCurrentTurn() PieceColor
+        +getStatus() GameStatus
+    }
+    class GameStatus {
+        <<enumeration>>
+        IN_PROGRESS
+        CHECK
+        CHECKMATE
+        STALEMATE
+    }
+    class ChessMatch {
+        -board: Board
+        -moveValidator: MoveValidator
+        -checkDetector: CheckDetector
+        -currentTurn: PieceColor
+        +newStandardMatch()$ ChessMatch
+        +move(Position, Position) MoveResult
+        +getPieceAt(Position) Piece
+        +getStatus() GameStatus
+        -hasAnyLegalMove() boolean
+    }
+    class Board {
+        <<desde dominio>>
+    }
+    class Piece {
+        <<desde dominio>>
+    }
+    class PieceColor {
+        <<enumeration, desde dominio>>
+    }
+
+    ChessGame <|.. ChessMatch : implements
+    ChessMatch "1" o-- "1" Board
+    ChessMatch "1" o-- "1" MoveValidator
+    ChessMatch "1" o-- "1" CheckDetector
+    ChessMatch ..> PieceColor
+    MoveValidator "1" o-- "1" CheckDetector
+    MoveValidator ..> Move
+    MoveValidator ..> MoveResult : retorna
+    MoveResult ..> MoveFailureReason
+    MoveResult ..> Piece
+    CheckDetector ..> Board
+    ChessGame ..> Piece
