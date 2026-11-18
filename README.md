@@ -1,5 +1,15 @@
 # Ajedrez · TPO Ingeniería de Software
 
+**UADE · Ingeniería de Software · 2026 · Docente: Christian David Tortorella Rojas**
+
+**Integrantes:**
+- Yamil Massuh — LU 1167588
+- Juan Manuel Iocco Cragnaz — LU 1158914
+- Erick Santiago Caceres Hernandez — LU 1246309
+- Tobias Martinez Villafañe — LU 1207430
+- Joaquin Garrido — LU 1157948
+- Laureano Vicens — LU 1191172
+
 Proyecto Java 17 con interfaz JavaFX para dos jugadores locales. Se agregó
 un adaptador `gui/` al proyecto original. **Todos los archivos de `domain/`,
 `application/` y `console/` se conservaron sin cambios.**
