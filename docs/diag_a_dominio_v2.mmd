@@ -1,0 +1,83 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontFamily':'Liberation Serif, Georgia, serif', 'primaryColor':'#ffffff', 'primaryBorderColor':'#33415c', 'primaryTextColor':'#1a1a1a', 'lineColor':'#5c6b7a', 'secondaryColor':'#f7f5f0', 'tertiaryColor':'#ffffff', 'classText':'#1a1a1a', 'fontSize':'15px' }}}%%
+classDiagram
+    class Piece {
+        <<abstract>>
+        -color: PieceColor
+        +getReachablePositions(Position, Board) List~Position~*
+        +getThreatenedPositions(Position, Board) List~Position~
+        +getSymbol() char*
+        +getColor() PieceColor
+    }
+    class Pawn
+    class Rook
+    class Bishop
+    class Queen
+    class Knight
+    class King
+
+    Piece <|-- Pawn
+    Piece <|-- Rook
+    Piece <|-- Bishop
+    Piece <|-- Queen
+    Piece <|-- Knight
+    Piece <|-- King
+
+    class Board {
+        -dimensions: BoardDimensions
+        -squares: Map~Position,Piece~
+        +getPieceAt(Position) Piece
+        +placePiece(Position, Piece)
+        +movePiece(Position, Position)
+        +findKing(PieceColor) Position
+        +clone() Board
+        +isOccupiedByEnemy(Position, PieceColor) boolean
+    }
+    class BoardDimensions {
+        <<record>>
+        +width: int
+        +height: int
+    }
+    class Position {
+        <<record>>
+        +row: int
+        +column: int
+        +isWithin(BoardDimensions) boolean
+        +translate(Direction) Position
+    }
+    class PieceColor {
+        <<enumeration>>
+        WHITE
+        BLACK
+        +opposite() PieceColor
+    }
+    class Direction {
+        <<record>>
+        +deltaRow: int
+        +deltaColumn: int
+    }
+    class SlidingMovement {
+        <<utility>>
+        +getPositions(Position, Board, PieceColor, List~Direction~)$ List~Position~
+    }
+    class FixedOffsetMovement {
+        <<utility>>
+        +getPositions(Position, Board, PieceColor, List~Direction~)$ List~Position~
+    }
+    class StandardChessSetup {
+        <<utility>>
+        +createInitialBoard()$ Board
+        +createInitialBoard(BoardDimensions)$ Board
+    }
+
+    Board "1" o-- "0..*" Piece : squares
+    Board --> BoardDimensions
+    Piece --> PieceColor : color
+    Rook ..> SlidingMovement : usa
+    Bishop ..> SlidingMovement : usa
+    Queen ..> SlidingMovement : usa
+    Knight ..> FixedOffsetMovement : usa
+    King ..> FixedOffsetMovement : usa
+    SlidingMovement ..> Direction
+    FixedOffsetMovement ..> Direction
+    StandardChessSetup ..> Board : crea
+    StandardChessSetup ..> Piece : crea instancias
